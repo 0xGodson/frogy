@@ -1,37 +1,17 @@
 #!/bin/bash
 
-echo -e "
-           .,;::::,..      ......      .,:llllc;'.
-        .cxdolcccloddl;:looooddooool::xxdlc:::clddl.
-       cxo;'',;;;,,,:ododkOOOOOOOOkdxxl:,';;;;,,,:odl
-      od:,;,...x0c:c;;ldox00000000dxdc,,:;00...,:;;cdl
-     'dc,;.    ..  .o;:odoOOOOOOOOodl,;;         ::;od.
-     'ol';          :o;odlkkkkkkkxodl,d          .o;ld.
-     .do,o..........docddoxxxxxxxxodo;x,.........:d;od'
-     ;odlcl,......,odcdddodddddddddddl:d:.......:dcodl:.
-    ;clodocllcccloolldddddddddddddddddoclllccclollddolc:
-   ,:looddddollllodddddddddddddddddddddddollllodddddooc:,
-   ':lloddddddddddddddddxxdddddddodxddddddddddddddddoll:'
-    :cllclodddddddddddddxloddddddllddddddddddddddolcllc:
-     :cloolclodxxxdddddddddddddddddddddddxxxxollclool:,
-       ::cloolllllodxxxxxxxxxxxxxxkkkxxdolllllooolc:;
-         .::clooddoollllllllllllllllllloodddolcc:,
-              ,:cclloodddxxxxxxxxxdddoollcc::.
-                     .,:ccccccccccc:::.
-"
 
 ############################################################### Housekeeping tasks ######################################################################
 
-echo -e "\e[94mEnter the organisation name (E.g., Carbon Black): \e[0m"
-read org
+org = $1
 
 cdir=`echo $org | tr '[:upper:]' '[:lower:]'| tr " " "_"`
 
 cwhois=`echo $org | tr " " "+"`
 
 
-echo -e "\e[94mEnter the root domain name (eg: frogy.com): \e[0m"
-read domain_name
+# echo -e "\e[94mEnter the root domain name (eg: frogy.com): \e[0m"
+domain_name $2
 echo -e "\e[92mHold on! some house keeping tasks being done... \e[0m"
 if [[ -d output ]]
 then
@@ -132,14 +112,14 @@ echo -e "\e[36mFindomain count: \e[32m$(cat output/$cdir/findomain.txtls | tr '[
 
 #################### DNSCAN ENUMERATION ######################
 
-python3 dnscan/dnscan.py -d %%.$domain_name -w wordlist/subdomains-top1million-5000.txt -D -o output/$cdir/dnstemp.txtls > /dev/null 2>&1
+python3 /usr/bin/dnscan.py -d %%.$domain_name -w /root/tools/frogy/wordlist/subdomains-top1million-5000.txt -D -o output/$cdir/dnstemp.txtls > /dev/null 2>&1
 cat output/$cdir/dnstemp.txtls | grep $domain_name | egrep -iv ".(DMARC|spf|=|[*])" | cut -d " " -f1 | anew | sort -u | grep -v " "|grep -v "@" | grep "\." >>  output/$cdir/dnscan.txtls
 rm output/$cdir/dnstemp.txtls
 echo -e "\e[36mDnscan: \e[32m$(cat output/$cdir/dnscan.txtls | tr '[:upper:]' '[:lower:]'| anew | grep -v " "|grep -v "@" | grep "\." | wc -l)\e[0m"
 
 #################### GATHERING ROOT DOMAINS ######################
 
-python3 rootdomain.py | cut -d " " -f7 | tr '[:upper:]' '[:lower:]' | anew | sed '/^$/d' | grep -v " "|grep -v "@" | grep "\." >> rootdomain.txtls
+python3 /usr/bin/rootdomain.py | cut -d " " -f7 | tr '[:upper:]' '[:lower:]' | anew | sed '/^$/d' | grep -v " "|grep -v "@" | grep "\." >> rootdomain.txtls
 
 #################### SUBFINDER2 ENUMERATION ######################
 
