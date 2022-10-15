@@ -3,17 +3,16 @@
 
 ############################################################### Housekeeping tasks ######################################################################
 
-$org = $1
+echo -e "\e[94mEnter the organisation name (E.g., Carbon Black): \e[0m"
+read org
 
 cdir=`echo $org | tr '[:upper:]' '[:lower:]'| tr " " "_"`
 
 cwhois=`echo $org | tr " " "+"`
 
 
-# echo -e "\e[94mEnter the root domain name (eg: frogy.com): \e[0m"
-@domain_name = $2
-
-echo $1 $2
+echo -e "\e[94mEnter the root domain name (eg: frogy.com): \e[0m"
+read domain_name
 echo -e "\e[92mHold on! some house keeping tasks being done... \e[0m"
 if [[ -d output ]]
 then
